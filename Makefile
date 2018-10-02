@@ -4,8 +4,14 @@ LD = ld
 
 objs = boot.bin
 
-boot.bin : bootloader/boot.o
+.PHONY : boot debug 
+
+boot : boot.bin
+
+bootloader/boot.o :
 	(cd bootloader; make)
+
+boot.bin : bootloader/boot.o
 	$(LD) -melf_x86_64 --oformat binary -e _start -o $@ $^ -Ttext 0x7c00
 
 install-boot :
@@ -16,6 +22,9 @@ install-loader :
 
 install-kernel : 
 	dd if=kernel.bin of=debug/a.img bs=512 seek =3 count=10
+
+debug : 
+	(cd debug; bochs -f bochsrc)
 
 clean : 
 	(cd bootloader; make clean)

@@ -1,3 +1,7 @@
+CC = gcc
+AS = as
+LD = ld
+
 objs := boot.o loader.o
 
 boot.o : boot.S
