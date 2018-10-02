@@ -1,0 +1,18 @@
+romimage: file=$BXSHARE/BIOS-bochs-latest 
+
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+
+# 1.44=磁盘镜像位置
+floppya: 1_44=a.img, status=inserted
+
+# 从软盘启动
+boot: floppy
+
+log: bochsout.txt
+
+# 置鼠标不可用
+mouse: enabled=0
+
+keyboard: keymap=#$BXSHARE/keymaps/x11-pc-us.map
+
+megs: 32

@@ -1,30 +1,27 @@
-#####################################################################
-# makefile for cinix
-# author: wangchunlei
-# date: 2014-1-30
-#####################################################################
+CC = gcc
+LD = ld
+CFLAGS = -c -o
+LDFLAGS = -melf_x86_64 --oformat binary -e _start -o 
 
-.PHONY : everything clean all install
-everything :
-	make -f ./boot/makefile		
-	make -f ./kernel/makefile
+TARGET = boot.bin
+objs = boot.bin boot.o
+
+.PHONY : everything clean all
+
+everything : $(TARGET)
+
+install :
+	dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc
+	dd if=kernel/kernel.bin of=a.img bs=512 seek=1 count=10
+
 clean : 
-	cd ./boot  \
-	make clean \
-	cd ..	   \
-	cd ./kernel \
-	make clean \
-	cd .. 
+	rm -rf $(objs)
 
 all : clean everything
 
+boot.bin : boot.o
+	$(LD) $(LDFLAGS) $@ $^ -Ttext 0x7c00
 
-install : 
-	sudo mount /home/chunlei/Desktop/a.img /mnt/floppy
-#	sudo rm /mnt/floppy/loader.bin
-#	souo rm /mnt/floppy/kernel.bin
-	sudo cp ./loader.bin /mnt/floppy
-	sudo cp ./kernel.bin /mnt/floppy
-	sudo umount -l /mnt/floppy
-	sudo bochs -f /home/chunlei/Desktop/bochsrc
+boot.o : boot.S
+	$(CC) $(CFLAGS) $@ $^
 
