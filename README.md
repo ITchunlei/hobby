@@ -1,4 +1,5 @@
-cinix
+Hobby Kernel
 =====
 
-kernel for learning
+
+

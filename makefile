@@ -1,27 +1,22 @@
 CC = gcc
+AS = as
 LD = ld
-CFLAGS = -c -o
-LDFLAGS = -melf_x86_64 --oformat binary -e _start -o 
 
-TARGET = boot.bin
-objs = boot.bin boot.o
+objs = boot.bin
 
-.PHONY : everything clean all
+boot.bin : bootloader/boot.o
+	(cd bootloader; make)
+	$(LD) -melf_x86_64 --oformat binary -e _start -o $@ $^ -Ttext 0x7c00
 
-everything : $(TARGET)
+install-boot :
+	dd if=boot.bin of=debug/a.img bs=512 count=1 conv=notrunc
 
-install :
-	dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc
-	dd if=kernel/kernel.bin of=a.img bs=512 seek=1 count=10
+install-loader :
+	dd if=loader.bin of=debug/a.img bs=512 seek=1 count=2
+
+install-kernel : 
+	dd if=kernel.bin of=debug/a.img bs=512 seek =3 count=10
 
 clean : 
+	(cd bootloader; make clean)
 	rm -rf $(objs)
-
-all : clean everything
-
-boot.bin : boot.o
-	$(LD) $(LDFLAGS) $@ $^ -Ttext 0x7c00
-
-boot.o : boot.S
-	$(CC) $(CFLAGS) $@ $^
-
