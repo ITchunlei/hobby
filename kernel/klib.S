@@ -1,48 +1,49 @@
-    .section .text
-    .extern _boot_param
+//    .section .text
+//    .extern _boot_param
+//    .code32
+//    .globl lgdt
+//lgdt:
+//    push %edx
+//    mov 4(%esp), %edx
+//    lgdt (%edx)
+//    pop %edx
+//    ret
+//
+//
+///**
+// * void out_byte(u16_t port, u8_t value);
+// */
+//    .globl out_byte
+//out_byte:
+//    mov 4(%esp), %edx
+//    mov 8(%esp), %al
+//    out %al, %dx
+//    nop
+//    nop
+//    ret
+//
+///**
+// * u8_t in_byte(u16_t port);
+// */
+//    .globl in_byte
+//in_byte:
+//    mov 4(%esp), %edx
+//    xor %eax, %eax
+//    in %dx, %al
+//    nop
+//    nop
+//    ret
 
-    .globl lgdt
-lgdt:
-    push %edx
-    mov 4(%esp), %edx
-    lgdt (%edx)
-    pop %edx
-    ret
-
-
-/**
- * void out_byte(u16_t port, u8_t value);
- */
-    .globl out_byte
-out_byte:
-    mov 4(%esp), %edx
-    mov 8(%esp), %al
-    out %al, %dx
-    nop
-    nop
-    ret
-
-/**
- * u8_t in_byte(u16_t port);
- */
-    .globl in_byte
-in_byte:
-    mov 4(%esp), %edx
-    xor %eax, %eax
-    in %dx, %al
-    nop
-    nop
-    ret
-
+	.section .text
     .globl kprint
 kprint:
-    push    %ebp
-    movl    %esp, %ebp
-    push    %ebx
-    push    %esi
-    push    %edi
+	pushq    %rbp
+    movq    %rsp, %rbp
+    push    %rbx
+    push    %rsi
+    push    %rdi
 
-    movl    8(%ebp), %esi
+    movq    8(%rbp), %rsi
     movl    _boot_param, %edi
     movb    $0x0f, %ah
 1:
@@ -51,7 +52,7 @@ kprint:
     jz    2f
     cmp    $0x0a, %al
     jnz    3f
-    push    %eax
+    push    %rax
     movl    %edi, %eax
     movb    $160, %bl
     div    %bl
@@ -60,7 +61,7 @@ kprint:
     movb    $160, %bl
     mul    %bl
     movl    %eax, %edi
-    popl    %eax
+    popq    %rax
     jmp    1b
 3:
     mov    %ax, %gs:0x0b8000(%edi)
@@ -69,8 +70,8 @@ kprint:
 2:
     movl    %edi,  _boot_param
 
-    popl    %edi
-    popl    %esi
-    popl    %ebx
-    popl    %ebp
+    popq    %rdi
+    popq    %rsi
+    popq    %rbx
+    popq    %rbp
     ret
