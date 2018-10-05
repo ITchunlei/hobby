@@ -13,7 +13,7 @@ _start:
     movw $_start, %sp
 
     call read_bs
-    call disp_str
+    //call disp_str
 
     ljmp $0x0, $0x9100
 

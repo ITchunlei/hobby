@@ -1,31 +1,31 @@
 CC = gcc
 AS = as
 LD = ld
-CFLAGS :=  -mcmodel=large -m64 -c
+CFLAGS := -mcmodel=large -m64 -c
 ASFLAGS := --64
 LDFLAGS := -b elf64-x86-64
 
 TARGET = kernel.elf
 
-objs = kernel.elf start.o kmain.o klib.o
+objs = kernel.elf start.o main.o klib.o
 
 .PHONY : everything clean all
+
+all : clean everything
 
 everything : $(TARGET)
 
 clean :
 	rm -rf $(objs)
 
-all : clean everything
-
 start.o : start.S
 	$(CC) $(CFLAGS) -o $@ $^
 
-kmain.o : kmain.c
+main.o : main.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 klib.o : klib.S
 	$(CC) $(CFLAGS) -o $@ $^
 
-kernel.elf : start.o kmain.o klib.o
+kernel.elf : start.o main.o klib.o
 	$(LD) $(LDFLAGS) -o $@ $^ -T kernel.lds

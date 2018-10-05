@@ -35,7 +35,7 @@ read_bs:
     push %es
     movw $0x0201, %ax
     /** 读一个扇区 **/
-    movb $0x6, %al
+    movb $0xf, %al
     movb $0x0, %ch
     /** 0-5 起始扇区 6-7 磁道**/
     movb $0x04, %cl
