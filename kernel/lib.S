@@ -1,39 +1,3 @@
-//    .section .text
-//    .extern _boot_param
-//    .code32
-//    .globl lgdt
-//lgdt:
-//    push %edx
-//    mov 4(%esp), %edx
-//    lgdt (%edx)
-//    pop %edx
-//    ret
-//
-//
-///**
-// * void out_byte(u16_t port, u8_t value);
-// */
-//    .globl out_byte
-//out_byte:
-//    mov 4(%esp), %edx
-//    mov 8(%esp), %al
-//    out %al, %dx
-//    nop
-//    nop
-//    ret
-//
-///**
-// * u8_t in_byte(u16_t port);
-// */
-//    .globl in_byte
-//in_byte:
-//    mov 4(%esp), %edx
-//    xor %eax, %eax
-//    in %dx, %al
-//    nop
-//    nop
-//    ret
-
 	.section .text
     .globl kprint
 kprint:

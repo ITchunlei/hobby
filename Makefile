@@ -9,6 +9,7 @@ objs = boot.bin loader.bin kernel.bin
 all : clean boot.bin loader.bin kernel.bin install-boot install-loader install-kernel
 
 kernel : kernel.bin  install-kernel
+	ls -al kernel.bin
 	rm -rf kernel.bin
 
 boot.bin : bootloader/boot.o

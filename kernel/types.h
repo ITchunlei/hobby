@@ -3,16 +3,49 @@
 
 typedef unsigned char      u8_t;
 typedef unsigned short     u16_t;
-typedef unsigned long      u32_t;
+typedef unsigned int       u32_t;
 typedef unsigned long long u64_t;
 
+#define DESC_ATTR()
+
+inline void set_desc()
+{
+    
+}
 
 typedef struct {
-    u16_t offset_l;
+    u32_t	reserved0;
+    u64_t	rsp0;
+    u64_t 	rsp1;
+    u64_t	rsp2;
+    u32_t	reserved1;
+    u32_t	reserved2;
+    u64_t	ist1;
+    u64_t	ist2;
+    u64_t	ist3;
+    u64_t	ist4;
+    u64_t	ist5;
+    u64_t	ist6;
+    u64_t	ist7;
+    u32_t	reserved3;
+    u32_t	reserved4;
+    u16_t	reserved5;
+    u16_t	io_map_base;
+}__attribute__((packed)) tss_t;
+
+typedef struct {
+    u16_t offset_1;
     u16_t sel;
     u16_t attr;
-    u16_t offset_h;
+    u16_t offset_2;
+    u32_t offset_3;
+    u32_t reserved;
 }__attribute__((packed)) gate_t;
+
+typedef struct {
+    u16_t limit;
+    u64_t base;
+}__attribute__((packed)) idt_p_t;
 
 typedef struct {
     u16_t limit_l;
@@ -51,7 +84,7 @@ typedef struct {
     u32_t    ldt;
     u16_t    trap;
     u16_t    io_base;
-}__attribute__((packed)) tss_t;
+}__attribute__((packed)) tss32_t;
 
 
 #endif /* _LOS_TYPES_H_ */
