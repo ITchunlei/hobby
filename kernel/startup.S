@@ -42,12 +42,12 @@ GLOBAL(_start)
 	movl	$0x92007,	0x91000
 
 #	pde
-	movl	$0x000083,	0x92000
-	movl	$0x200083,	0x92008
-	movl	$0x400083,	0x92010
-	movl	$0x600083,	0x92018
-	movl	$0x800083,	0x92020
-	movl	$0xa00083,	0x92028
+	movl	$0x000087,	0x92000
+	movl	$0x200087,	0x92008
+	movl	$0x400087,	0x92010
+	movl	$0x600087,	0x92018
+	movl	$0x800087,	0x92020
+	movl	$0xa00087,	0x92028
 
     lgdt    gdtr
 
@@ -90,7 +90,7 @@ start64:
 	ltr	%ax
 
     movq    go_to_kernel(%rip),    %rax
-	pushfq
+#	pushfq
     pushq    $0x08
     pushq    %rax
     lretq
@@ -111,7 +111,17 @@ gdt:
     .quad    0x0000000000000000            /*3    USER    Code    32-bit    Segment 18*/
     .quad    0x0000000000000000            /*4    USER    Data    32-bit    Segment 20*/
     .quad    0x0020f80000000000            /*5    USER    Code    64-bit    Segment    28*/
-    .quad    0x0000f20000000000            /*6    USER    Data    64-bit    Segment    30*/
+    /* USER_CODE_64_SELECTOR */
+//    .short 0xffff           /* limit 15:00 */
+//    .short 0x0000           /* base 15:00 */
+//    .byte  0x00             /* base 23:16 */
+//    .byte  0b11111010       /* P(1) DPL(11) S(1) 1 C(0) R(1) A(0) */
+//    .byte  0b10101111       /* G(1) D(0) L(1) AVL(0) limit 19:16 */
+//    .byte  0x0              /* base 31:24 */
+
+
+
+	.quad    0x0000f20000000000            /*6    USER    Data    64-bit    Segment    30*/
     .quad    0x00cf9a000000ffff            /*7    KERNEL    Code    32-bit    Segment    38*/
     .quad    0x00cf92000000ffff            /*8    KERNEL    Data    32-bit    Segment    40*/
 //    /* null entry */
@@ -154,17 +164,11 @@ gdt:
 //    .byte  0b11001111       /* G(1) B(1) 0 0 limit 19:16 */
 //    .byte  0x0              /* base 31:24 */
 //
-//    /* USER_CODE_64_SELECTOR */
-//    .short 0xffff           /* limit 15:00 */
-//    .short 0x0000           /* base 15:00 */
-//    .byte  0x00             /* base 23:16 */
-//    .byte  0b11111010       /* P(1) DPL(11) S(1) 1 C(0) R(1) A(0) */
-//    .byte  0b10101111       /* G(1) D(0) L(1) AVL(0) limit 19:16 */
-//    .byte  0x0              /* base 31:24 */
+
 
     /* TSS_SELECTORs */
     .short 0x68              /* limit 15:00 */
-    .short 0                /* base 15:00 */
+    .short tss                /* base 15:00 */
     .byte  0                /* base 23:16 */
     .byte  0b10001001       /* P(1) DPL(00) 0 10 B(0) 1 */
     .byte  0b10000000       /* G(1) 0 0 AVL(0) limit 19:16 */
@@ -178,9 +182,9 @@ gdtr:
 
 tss:
 	.long	 0x0  // reserved
-	.quad	 stack_top  //rsp0
-	.quad	 stack_top  //rsp1
-	.quad	 stack_top  //rsp2
+	.quad	 0x200000  //rsp0
+	.quad	 0x200000  //rsp1
+	.quad	 0x200000  //rsp2
 	.quad	 0x0  //reserved
 	.quad	 0x7c00  //ist1
     .quad    0x7c00  //ist2

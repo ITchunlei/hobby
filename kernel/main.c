@@ -15,9 +15,13 @@
 
 void timer_interrupt();
 
-void handle() {
-    print_str("hello--");
+void user_mode();
+
+void l3_mode() {
+    print_str("into user mode !!!");
+    for(;;);
 }
+
 
 void start_kernel()
 {
@@ -33,7 +37,7 @@ void start_kernel()
     
     print_str("init interrupt handlers\n");
     int i;
-    for (i = 31;i < 256; ++i) {
+    for (i = 32;i < 256; ++i) {
         u64_t addr = (u64_t)timer_interrupt;
         idt[i].sel = 0x8;
         idt[i].attr = 0x8E00;
@@ -54,7 +58,10 @@ void start_kernel()
     
     open_irq();
     
-    __asm__ __volatile__("int $0");
+    //__asm__ __volatile__("int $0");
+    
+    
+    user_mode();
     
     for(;;);
 }

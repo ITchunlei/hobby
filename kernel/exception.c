@@ -55,7 +55,7 @@ void exception_init(gate_t* idt)
     set_exception_gate(&idt[11], segment_not_present);
     set_exception_gate(&idt[12], stack_segment_fault);
     set_exception_gate(&idt[13], general_protection);
-    set_exception_gate(&idt[15], page_fault);
+    set_exception_gate(&idt[14], page_fault);
     set_exception_gate(&idt[15], x87_fpu_floating_poing_error);
     set_exception_gate(&idt[16], alignment_check);
     set_exception_gate(&idt[17], machine_check);

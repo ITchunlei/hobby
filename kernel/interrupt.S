@@ -92,8 +92,44 @@ exception:
 	addq	$0x10,	%rsp
 	hlt
 
-
 GLOBAL(timer_interrupt)
 	callq	do_timer_interrup
+	hlt
+	//iretq
+
+
+
+GLOBAL(user_mode)
+    #    top-level pde
+    movl    $0x81007,    0x80000
+    #    movq    $0x91007,    0x90800
+
+    #    two-level pde
+    movl    $0x82007,    0x81000
+
+    #    pde
+    movl    $0x000087,    0x82000
+    movl    $0x200087,    0x82008
+    movl    $0x400087,    0x82010
+    movl    $0x600087,    0x82018
+    movl    $0x800087,    0x82020
+    movl    $0xa00087,    0x82028
+
+
+	pushq	$0x33
+	pushq	$0x1000
+	pushq	$0x0002
+	pushq	$0x2b
+	movq    go_to_l3_mode(%rip),    %rax
+	pushq	%rax
+
+
+    mov    $0x80000,    %eax
+    mov    %eax,    %cr3
+
+	//jmp .
 	iretq
+
+go_to_l3_mode:
+	.quad	l3_mode
 
