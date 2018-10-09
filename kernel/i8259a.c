@@ -28,6 +28,6 @@ void init_i8259a()
     out_byte(I8259A_M_CTLM, 0x1);
     out_byte(I8259A_S_CTLM, 0x1);
     
-    out_byte(I8259A_M_CTLM, 0xff);
+    out_byte(I8259A_M_CTLM, 0xfe);
     out_byte(I8259A_S_CTLM, 0xff);
 }

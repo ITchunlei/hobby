@@ -12,7 +12,7 @@
 
 void do_timer_interrup()
 {
-    print_str("\n\ndo_timer_interrupt!!!\n");
+    print_str(".T");
 }
 
 void divide_error();

@@ -30,7 +30,7 @@ typedef struct {
     u32_t	reserved3;
     u32_t	reserved4;
     u16_t	reserved5;
-    u16_t	io_map_base;
+    u16_t	io_map;
 }__attribute__((packed)) tss_t;
 
 typedef struct {

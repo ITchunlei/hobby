@@ -18,8 +18,11 @@ void timer_interrupt();
 void user_mode();
 
 void l3_mode() {
-    print_str("into user mode !!!");
-    for(;;);
+    for(;;) {
+    	print_str(".um");
+        int i;
+        for(i = 0;i < 10000000; ++i);
+    }
 }
 
 
@@ -56,7 +59,7 @@ void start_kernel()
     print_str("init i8259a\n");
     init_i8259a();
     
-    open_irq();
+    //open_irq();
     
     //__asm__ __volatile__("int $0");
     

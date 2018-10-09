@@ -93,9 +93,70 @@ exception:
 	hlt
 
 GLOBAL(timer_interrupt)
+	cld
+#	保存上下文
+#	pushq	%ss
+#	pushq	%rsp
+#	pushq	%rip
+#	pushq	%cs
+
+	pushq	%rax
+	pushq	%rcx
+	pushq	%rdx
+	pushq	%rbx
+	pushq	%rsi
+	pushq	%rdi
+	pushq	%r8
+	pushq	%r9
+	pushq	%r10
+	pushq	%r11
+	pushq	%r12
+	pushq	%r13
+	pushq	%r14
+	pushq	%r15
+	movq	%ds, %rax
+	pushq	%rax
+	movq	%es, %rax
+	pushq	%rax
+	pushq	%fs
+	pushq	%gs
+
+
+
+#	进入中断处理
 	callq	do_timer_interrup
-	hlt
-	//iretq
+	mov	$0x20, %al
+	out	%al, $0x20
+
+
+
+#    恢复上下文
+	popq	%gs
+	popq	%fs
+	popq	%rax
+	movq	%rax, %es
+	popq	%rax
+	movq	%rax, %ds
+	popq	%r15
+	popq	%r14
+	popq	%r13
+	popq	%r12
+	popq	%r11
+	popq	%r10
+	popq	%r9
+	popq	%r8
+	popq	%rdi
+	popq	%rsi
+	popq	%rbx
+	popq	%rdx
+	popq	%rcx
+	popq	%rax
+
+#	popq	%cs
+#	popq	%rip
+#	popq	%rsp
+#	popq	%ss
+	iretq
 
 
 
@@ -117,8 +178,8 @@ GLOBAL(user_mode)
 
 
 	pushq	$0x33
-	pushq	$0x1000
-	pushq	$0x0002
+	pushq	$0x200000
+	pushq	$0x1202
 	pushq	$0x2b
 	movq    go_to_l3_mode(%rip),    %rax
 	pushq	%rax
@@ -126,7 +187,7 @@ GLOBAL(user_mode)
 
     mov    $0x80000,    %eax
     mov    %eax,    %cr3
-
+	//sti
 	//jmp .
 	iretq
 
