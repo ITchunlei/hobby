@@ -1,6 +1,12 @@
-CC = gcc
-AS = as
-LD = ld
+#CC = gcc
+#AS = as
+#LD = ld
+#OBJCOPY = objcopy
+
+CC = x86_64-linux-gnu-gcc
+LD = x86_64-linux-gnu-ld
+
+OBJCOPY = x86_64-linux-gnu-objcopy
 
 objs = boot.bin loader.bin kernel.bin
 
@@ -13,20 +19,20 @@ kernel : kernel.bin  install-kernel
 	rm -rf kernel.bin
 
 boot.bin : bootloader/boot.o
-	$(LD) -melf_x86_64 --oformat binary -e _start -o $@ $^ -Ttext 0x7c00
+	$(LD) -melf_i386 --oformat binary -e _start -o $@ $^ -Ttext 0x7c00
 
 bootloader/boot.o :
 	(cd bootloader; make boot)
 
 loader.bin : bootloader/loader.o
-	$(LD) -melf_x86_64 --oformat binary -e _start -o $@ $^ -Ttext 0x9100
+	$(LD) -melf_i386 --oformat binary -e start -o $@ $^ -Ttext 0x9100
 
 bootloader/loader.o :
 	(cd bootloader; make loader)
 
 kernel.bin :
 	(cd kernel; make)
-	objcopy -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary kernel/kernel.elf kernel.bin
+	$(OBJCOPY) -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary kernel/kernel.elf kernel.bin
 
 install-boot :
 	dd if=boot.bin of=debug/a.img bs=512 count=1 conv=notrunc
