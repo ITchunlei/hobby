@@ -1,4 +1,3 @@
-#include "config.h"
     .code16
     .section .text
     .global _start

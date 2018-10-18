@@ -6,10 +6,13 @@
 //  Copyright © 2018 los. All rights reserved.
 //
 
-#ifndef lib_h
-#define lib_h
+#ifndef __LIB_H__
+#define __LIB_H__
 
-#define GLOBAL(L) .global L; L:
-#define FUNCTION(N) GLOBAL(N)
+void enable_A20();
 
-#endif /* lib_h */
+void enable_PE();
+
+//void read_sector(int start, );
+
+#endif /* __LIB_H__ */

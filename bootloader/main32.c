@@ -1,3 +1,4 @@
+
 //
 //  main32.c
 //  Hobby
@@ -6,4 +7,6 @@
 //  Copyright © 2018 los. All rights reserved.
 //
 
-#include <stdio.h>
+void main32() {
+
+}

@@ -6,4 +6,12 @@
 //  Copyright © 2018 los. All rights reserved.
 //
 
-#include <stdio.h>
+__asm__(".code16gcc");
+
+#include "lib.h"
+
+void l_main()
+{
+    enable_A20();
+    enable_PE();
+}

@@ -1,4 +1,21 @@
-#include "lib.h"
+#define GLOBAL(L) .global L; L:
+#define FUNCTION(N) GLOBAL(N)
+
+.global enable_A20
+enable_A20:
+    inb    $0x92, %al
+    orb    $0x2, %al
+    outb    %al, $0x92
+	ret
+
+.global enable_PE
+enable_PE:
+    mov    %cr0, %eax
+    orl    $0x1, %eax
+    mov    %eax, %cr0
+	ret
+
+
 FUNCTION(read_bs)
     movw $0x0201, %ax
     /** 读一个扇区 **/
