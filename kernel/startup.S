@@ -34,6 +34,8 @@ GLOBAL(_start)
 	mov %ax, %gs
 	mov $stack_top, %esp
 
+	hlt
+
 #	top-level pde
 	movl	$0x91003,	0x90000
 #	movq	$0x91007,	0x90800

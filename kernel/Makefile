@@ -1,14 +1,17 @@
-CC = gcc
-AS = as
-LD = ld
+#CC = gcc
+#AS = as
+#LD = ld
+
+CC = x86_64-linux-gnu-gcc
+LD = x86_64-linux-gnu-ld
 
 CFLAGS := -mcmodel=large -fno-stack-protector -fno-builtin -m64 -c
 ASFLAGS := --64
-LDFLAGS := -b elf64-x86-64
+LDFLAGS := -b elf64-x86-64 -z muldefs
 
 TARGET = kernel.elf
 
-objs = kernel.elf startup.o interrupt.o exception.o main.o klib.o lib.o i8259a.o
+objs = kernel.elf startup.o interrupt.o exception.o main.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
 
 .PHONY : everything clean all
 
@@ -37,8 +40,17 @@ klib.o : lib.S
 lib.o : lib.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+vsprintf.o : vsprintf.c
+	$(CC) $(CFLAGS) -o $@ $^
+
 i8259a.o : i8259a.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-kernel.elf : startup.o interrupt.o exception.o main.o klib.o lib.o i8259a.o
+thread.o : thread.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+proc.o : proc.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+kernel.elf : startup.o interrupt.o exception.o main.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
 	$(LD) $(LDFLAGS) -o $@ $^ -T kernel.lds

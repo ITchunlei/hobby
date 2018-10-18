@@ -13,15 +13,17 @@
 
 #define IDT_ATTR(P, DPL, TYPE, IST)
 
+static char my_buf[1024 * 1024] = {0};
+
 void timer_interrupt();
 
 void user_mode();
 
 void l3_mode() {
     for(;;) {
-    	print_str(".um");
+    	kprintf(".um");
         int i;
-        for(i = 0;i < 10000000; ++i);
+        for(i = 0;i < 1000000; ++i);
     }
 }
 
@@ -30,15 +32,15 @@ void start_kernel()
 {
     close_irq();
     
-   // kprintf("start_kernel\n");
+    kprintf("start_kernel\n");
     gate_t* idt = (gate_t*)0x100000;
     
     
-    print_str("init exception handlers\n");
+    kprintf("init exception handlers\n");
     exception_init(idt);
     
     
-    print_str("init interrupt handlers\n");
+    kprintf("init interrupt handlers\n");
     int i;
     for (i = 32;i < 256; ++i) {
         u64_t addr = (u64_t)timer_interrupt;
@@ -56,10 +58,12 @@ void start_kernel()
     
     load_idt(idt_ptr);
     
-    print_str("init i8259a\n");
+    //kprintf("init i8259a\n");
     init_i8259a();
     
     //open_irq();
+    
+	kprintf("=================================-------%d, %ld, %s\n", 100, 300000, "hello");
     
     //__asm__ __volatile__("int $0");
     

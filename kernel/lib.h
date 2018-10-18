@@ -23,7 +23,11 @@
 
 #define in_byte() __asm__ __volatile__ ()
 
-void kprintf(const char* format, ...);
+void kputc(char c);
+
+int kprintf(const char* format, ...);
+
+int vsprintf(char* buf, const char *format, va_list args);
 
 /*
  From => To memory copy Num bytes
@@ -235,13 +239,19 @@ inline int strncmp(char * FirstPart,char * SecondPart,long Count)
     return __res;
 }
 
-
-
-
-void print_str(char*);
-
-char* itoa(char*, int);
-
-int vsprintf(char* buf, const char *format, va_list args);
+static inline int strlen(char * String)
+{
+    register int __res;
+    __asm__    __volatile__    (    "cld    \n\t"
+                                "repne    \n\t"
+                                "scasb    \n\t"
+                                "notl    %0    \n\t"
+                                "decl    %0    \n\t"
+                                :"=c"(__res)
+                                :"D"(String),"a"(0),"0"(0xffffffff)
+                                :
+                                );
+    return __res;
+}
 
 #endif /* __LIB_H__ */

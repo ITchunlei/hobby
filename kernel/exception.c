@@ -12,7 +12,7 @@
 
 void do_timer_interrup()
 {
-    print_str(".T");
+    kprintf(".T");
 }
 
 void divide_error();
@@ -65,18 +65,7 @@ void exception_init(gate_t* idt)
 
 void do_exception(int vec_no, int err_code, int rip, int cs, int rflags)
 {
-    char buf[20];
-    print_str("vec_no:");
-    print_str(itoa(buf, vec_no));
-    print_str(" err_code:");
-    print_str(itoa(buf, err_code));
-    print_str(" rip:");
-    print_str(itoa(buf, rip));
-    print_str(" cs:");
-    print_str(itoa(buf, cs));
-    print_str(" rflags:");
-    print_str(itoa(buf, rflags));
-    print_str("\n");
+    kprintf("vec_no:%d,err_code:%d,rip:%d,cs:%d,rflags:%d\n", vec_no, err_code, rip, cs, rflags);
 }
 
 void set_exception_gate(gate_t* idt, void* handler)

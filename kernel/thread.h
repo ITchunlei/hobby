@@ -6,9 +6,17 @@
 //  Copyright © 2018 los. All rights reserved.
 //
 
-#ifndef thread_h
-#define thread_h
+#ifndef __THREAD_H__
+#define __THREAD_H__
 
-#include <stdio.h>
+struct regs_ {
+    
+};
 
-#endif /* thread_h */
+struct thread {
+    int	tid;
+    int parent_tid;
+    
+};
+
+#endif /* __THREAD_H__ */
