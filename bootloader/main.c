@@ -12,6 +12,9 @@ __asm__(".code16gcc");
 
 void l_main()
 {
-    enable_A20();
-    enable_PE();
+//    enable_A20();
+//    enable_PE();
+    
+    char* p = (char*)0x100000;
+    *p = 'A';
 }

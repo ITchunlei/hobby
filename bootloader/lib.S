@@ -8,12 +8,26 @@ enable_A20:
     outb    %al, $0x92
 	ret
 
-.global enable_PE
+.globl disable_A20
+disable_A20:
+    inb    $0x92, %al
+    orb    $~0x2, %al
+    outb   %al, $0x92
+    ret
+
+.globl enable_PE
 enable_PE:
     mov    %cr0, %eax
     orl    $0x1, %eax
     mov    %eax, %cr0
 	ret
+
+.globl disable_PE
+disable_PE:
+    mov    %cr0, %eax
+    andl    $~0x1, %eax
+    mov    %eax, %cr0
+    ret
 
 
 FUNCTION(read_bs)

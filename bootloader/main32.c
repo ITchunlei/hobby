@@ -8,5 +8,6 @@
 //
 
 void main32() {
-
+    char* p = (char*)0x100000;
+    *p = 'B';
 }

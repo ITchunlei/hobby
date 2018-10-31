@@ -1,7 +1,6 @@
-
-.text
-.code16
-.global start
+	.text
+	.code16
+	.globl start
 start:
 	cli
 	mov %cs, %ax
@@ -10,8 +9,22 @@ start:
 	mov %ax, %fs
 	mov %ax, %gs
 	mov %ax, %ss
-
 	mov $start, %sp
+
+	calll l_main
+
+	lgdtl gdtr
+
+    calll enable_A20
+
+	calll enable_PE
+
+	ljmpl $0x8, $tmp_protect_mode
+
+
+
+1:
+    jmp 1b
 
 #	loader kernel
 #	start 3 sector, temp read 255 sectors, ^^
@@ -30,7 +43,13 @@ start:
 #	jmp code32
 	ljmpl $0x8, $tmp_protect_mode
 
+r_mode_tmp:
+	calll disable_PE
+	ljmpl	$0, $r_mode
+
 r_mode:
+
+	calll main32
 	jmp .
 
 read_sector:
@@ -62,10 +81,18 @@ read_sector:
 	pop		%bp
 	ret
 
-.code32
-
+	.code32
 tmp_protect_mode:
-#	ljmp	$0,
+    mov    $0x10, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %ss
+    mov %ax, %fs
+    mov %ax, %gs
+
+	ljmp	$0x18, $r_mode_tmp
+
+	jmp .
 
 
 protect_mode:
@@ -82,13 +109,53 @@ protect_mode:
 	mov $0x1100, %eax
 	jmp *%eax
 
-.balign 4
+
+	.balign 8
 gdt:
-	.quad	0x0 /* null desc */
-	.quad	0x00cf9a000000ffff /* code desc */
-	.quad	0x00cf92000000ffff /* data desc */
-	.quad    0x00cf9a000000ffff /* code desc */
-	.quad    0x00cf92000000ffff /* data desc */
+	.quad	 0x0 /* null desc */
+
+    /* CODE_SELECTOR */
+    .short 0xffff           /* limit 15:00 */
+    .short 0x0000           /* base 15:00 */
+    .byte  0x00             /* base 23:16 */
+    .byte  0b10011010       /* P(1) DPL(00) S(1) 1 C(0) R(1) A(0) */
+    .byte  0b11001111       /* G(1) D(1) 0 0 limit 19:16 */
+    .byte  0x0              /* base 31:24 */
+
+     /* DATA_SELECTOR */
+    .short 0xffff           /* limit 15:00 */
+    .short 0x0000           /* base 15:00 */
+    .byte  0x00             /* base 23:16 */
+    .byte  0b10010010       /* P(1) DPL(00) S(1) 0 E(0) W(1) A(0) */
+    .byte  0b11001111       /* G(1) B(1) 0 0 limit 19:16 */
+    .byte  0x0              /* base 31:24 */
+
+    /* -- 16 bit real mode CS --
+     * base = 0x00000000, limit 0x0FFFF (1 B Granularity), present
+     * type = 16 bit code execute/read only/conforming, DPL = 0
+     */
+    .word    0xFFFF, 0
+    .byte    0, 0x9E, 0, 0
+
+    /* -- 16 bit real mode DS --
+     * base = 0x00000000, limit 0x0FFFF (1 B Granularity), present
+     * type = 16 bit data read/write, DPL = 0
+     */
+    .word    0xFFFF, 0
+    .byte    0, 0x92, 0, 0
+
+//     /* 16bit CODE_SELECTOR */
+//    .short 0xffff           /* limit 15:00 */
+//    .short 0x0000           /* base 15:00 */
+//    .byte  0x00             /* base 23:16 */
+//    .byte  0b10011010       /* P(1) DPL(00) S(1) 1 C(0) R(1) A(0) */
+//    .byte  0b11001111       /* G(1) D(1) 0 0 limit 19:16 */
+//    .byte  0x0              /* base 31:24 */
+//
+//    .quad     0x00cf9a000000ffff /* code desc */
+//    .quad     0x00cf92000000ffff /* data desc */
+//    .quad    0x00cf9a000000ffff /* code desc */
+//    .quad    0x00cf92000000ffff /* data desc */
 gdtr:
     .word    gdtr - gdt - 1
     .long    gdt
