@@ -6,6 +6,7 @@
 //  Copyright © 2018 los. All rights reserved.
 //
 
+#include "main.h"
 #include "lib.h"
 #include "i8259a.h"
 #include "exception.h"
@@ -13,7 +14,7 @@
 
 #define IDT_ATTR(P, DPL, TYPE, IST)
 
-static char my_buf[1024 * 1024] = {0};
+//static char my_buf[1024 * 1024] = {0};
 
 void timer_interrupt();
 
@@ -59,16 +60,16 @@ void start_kernel()
     load_idt(idt_ptr);
     
     //kprintf("init i8259a\n");
-    init_i8259a();
+    //init_i8259a();
     
     //open_irq();
-    
-	kprintf("=================================-------%d, %ld, %s\n", 100, 300000, "hello");
     
     //__asm__ __volatile__("int $0");
     
     
-    user_mode();
+    //user_mode();
+    
+    kernel_main();
     
     for(;;);
 }

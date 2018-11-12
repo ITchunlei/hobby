@@ -20,12 +20,10 @@
 //(6)    这时候处理器自动将EFER.LMA设置，进入长模式
 //(7)    一个跳转
 
-
-#include "asm.h"
-
 .text
 .code32
-GLOBAL(_start)
+.global _start
+_start:
 	mov $0x10, %ax
 	mov %ax, %ds
 	mov %ax, %es
@@ -33,8 +31,6 @@ GLOBAL(_start)
 	mov %ax, %fs
 	mov %ax, %gs
 	mov $stack_top, %esp
-
-	hlt
 
 #	top-level pde
 	movl	$0x91003,	0x90000

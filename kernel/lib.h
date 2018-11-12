@@ -9,7 +9,10 @@
 #ifndef __LIB_H__
 #define __LIB_H__
 
+#include "macros.h"
 #include <stdarg.h>
+
+__EXTERN_C_BEGIN
 
 #define load_gdt(gdt_ptr) __asm__ __volatile__ ("lgdt %0" : : "m" (gdt_ptr))
 
@@ -253,5 +256,7 @@ static inline int strlen(char * String)
                                 );
     return __res;
 }
+
+__EXTERN_C_END
 
 #endif /* __LIB_H__ */

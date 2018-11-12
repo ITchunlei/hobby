@@ -2,7 +2,7 @@
 	.code16
 	.globl start
 start:
-	cli
+#	cli
 	mov %cs, %ax
 	mov %ax, %ds
 	mov %ax, %es
@@ -11,20 +11,18 @@ start:
 	mov %ax, %ss
 	mov $start, %sp
 
-	calll l_main
+#	calll l_main
 
-	lgdtl gdtr
+#	lgdtl gdtr
 
-    calll enable_A20
 
-	calll enable_PE
 
-	ljmpl $0x8, $tmp_protect_mode
+#	ljmpl $0x8, $tmp_protect_mode
 
 
 
 1:
-    jmp 1b
+#    jmp 1b
 
 #	loader kernel
 #	start 3 sector, temp read 255 sectors, ^^
@@ -38,10 +36,14 @@ start:
 #	load gdt
 	lgdtl	gdtr
 
-    calll l_main
+    calll enable_A20
+
+    calll enable_PE
+
+#    calll l_main
 
 #	jmp code32
-	ljmpl $0x8, $tmp_protect_mode
+	ljmpl $0x8, $protect_mode
 
 r_mode_tmp:
 	calll disable_PE
@@ -49,7 +51,7 @@ r_mode_tmp:
 
 r_mode:
 
-	calll main32
+#	calll main32
 	jmp .
 
 read_sector:
