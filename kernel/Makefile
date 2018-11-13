@@ -50,8 +50,8 @@ vsprintf.o : vsprintf.c
 i8259a.o : i8259a.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-thread.o : thread.c
-	$(CC) $(CFLAGS) -o $@ $^
+thread.o : thread.cpp
+	$(CXX) $(CFLAGS) -o $@ $^
 
 proc.o : proc.c
 	$(CC) $(CFLAGS) -o $@ $^

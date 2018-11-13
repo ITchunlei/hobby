@@ -8,15 +8,7 @@
 
 #ifndef __THREAD_H__
 #define __THREAD_H__
-
-struct regs_ {
-    
+struct Thread {
+	
 };
-
-struct thread {
-    int	tid;
-    int parent_tid;
-    
-};
-
 #endif /* __THREAD_H__ */
