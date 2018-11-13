@@ -1,12 +1,20 @@
-#CC = gcc
-#AS = as
-#LD = ld
-#OBJCOPY = objcopy
-
+ARCH := $(shell uname -r)
+ifeq '${ARCH}' 'Linux'
+CC = gcc
+CXX = g++
+LD = ld
+OBJCOPY = objcopy
+else
 CC = x86_64-linux-gnu-gcc
+CXX = x86_64-linux-gnu-g++
 LD = x86_64-linux-gnu-ld
-
 OBJCOPY = x86_64-linux-gnu-objcopy
+endif
+
+export CC
+export CXX
+export LD
+export OBJCOPY
 
 objs = boot.bin loader.bin kernel.bin
 

@@ -2,9 +2,9 @@
 #AS = as
 #LD = ld
 
-CC = x86_64-linux-gnu-gcc
-C++ = x86_64-linux-gnu-g++
-LD = x86_64-linux-gnu-ld
+#CC = x86_64-linux-gnu-gcc
+#C++ = x86_64-linux-gnu-g++
+#LD = x86_64-linux-gnu-ld
 
 CFLAGS := -mcmodel=large -fno-stack-protector -fno-builtin -m64 -c
 ASFLAGS := --64
@@ -27,7 +27,7 @@ start.o : start.S
 	$(CC) $(CFLAGS) -o $@ $^
 
 kmain.o : main.cpp
-	$(C++) $(CFLAGS) -o $@ $^
+	$(CXX) $(CFLAGS) -o $@ $^
 
 interrupt.o : interrupt.S
 	$(CC) $(CFLAGS) -o $@ $^
