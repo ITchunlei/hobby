@@ -10,8 +10,6 @@
 #include "lib.h"
 #include "main.h"
 
-uint8_t a = 0;
-
 extern char __code_start[];
 extern char _end[];
 

@@ -20,22 +20,61 @@
 //(6)    这时候处理器自动将EFER.LMA设置，进入长模式
 //(7)    一个跳转
 
+
+#define KERNEL_LOADED 0x1100
+#define KERNEL_BASE 0xffff800000000000
+#define K_CODE_SELECTOR 0x8
 #define K_DATA_SELECTOR 0x10
 
-.text
+#define K_CODE32_SELECTOR 0x38
+#define K_DATA32_SELECTOR 0x40
+
+#define PHY_ADDR(x) ((x) - KERNEL_BASE + KERNEL_LOADED)
+
+.section .text
 .code32
 .global _start
 _start:
-    mov $K_DATA_SELECTOR, %ax
-    mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %ss
-	mov %ax, %fs
-	mov %ax, %gs
-	mov $stack_top, %esp
+    // load gdtr
+	lgdt PHY_ADDR(gdtr)
+
+	// set data selector
+    movw $K_DATA32_SELECTOR, %ax
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %ss
+    movw %ax, %fs
+    movw %ax, %gs
+
+	// use our gdt table
+    pushl $K_CODE32_SELECTOR
+	pushl $PHY_ADDR(.Lstart32)
+	lret
+
+.Lstart32:
+    mov $PHY_ADDR(stack_top), %esp
 
 #	top-level pde
 	movl	$0x91003,	0x90000
+    movl    $0x91003,    0x90008
+    movl    $0x91003,    0x90010
+    movl    $0x91003,    0x90018
+    movl    $0x91003,    0x90020
+    movl    $0x91003,    0x90028
+    movl    $0x91003,    0x90030
+    movl    $0x91003,    0x90038
+    movl    $0x91003,    0x90040
+    movl    $0x91003,    0x90048
+    movl    $0x91003,    0x90050
+    movl    $0x91003,    0x90058
+    movl    $0x91003,    0x90060
+    movl    $0x91003,    0x90068
+    movl    $0x91003,    0x90070
+    movl    $0x91003,    0x90078
+    movl    $0x91003,    0x90080
+    movl    $0x91003,    0x90088
+    movl    $0x91003,    0x90090
+    movl    $0x91003,    0x90098
 #	movq	$0x91007,	0x90800
 
 #	two-level pde
@@ -48,8 +87,6 @@ _start:
 	movl	$0x600083,	0x92018
 	movl	$0x800083,	0x92020
 	movl	$0xa00083,	0x92028
-
-    lgdt    gdtr
 
 #	open PAE
 	mov	%cr4,	%eax
@@ -72,19 +109,26 @@ _start:
 	bts	$31, %eax
 	mov %eax, %cr0
 
-	//ljmp	$0x8, $start64
-	pushfl
-	push	$0x8
-	push	$start64
-	lretl
+	pushl	$K_CODE_SELECTOR
+	pushl	$PHY_ADDR(start64)
+	lret
+
+// 64bit start
 .code64
 start64:
-    movq    $0x10, %rax
-    movq    %rax,    %ds
-    movq    %rax,    %es
-    movq    %rax,    %gs
-    movq    %rax,    %ss
-	movq	$stack_top, %rsp
+	movq $0xffff8000000011ae, %rax
+	jmp .
+	jmp *%rax
+
+.Lstart64:
+
+	jmp .
+    movq $K_DATA_SELECTOR, %rax
+    movq %rax, %ds
+    movq %rax, %es
+    movq %rax, %gs
+    movq %rax, %ss
+	lea stack_top(%rip), %rsp
 
 	mov	$0x48, %ax
 	ltr	%ax
@@ -103,7 +147,6 @@ go_to_kernel:
 	.quad start_kernel
 
 .data
-.balign 8
 gdt:
     .quad    0x0000000000000000            /*0    NULL descriptor                   00*/
     .quad    0x0020980000000000            /*1    KERNEL    Code    64-bit    Segment    08*/
@@ -111,7 +154,7 @@ gdt:
     .quad    0x0000000000000000            /*3    USER    Code    32-bit    Segment 18*/
     .quad    0x0000000000000000            /*4    USER    Data    32-bit    Segment 20*/
     .quad    0x0020f80000000000            /*5    USER    Code    64-bit    Segment    28*/
-    /* USER_CODE_64_SELECTOR */
+/* USER_CODE_64_SELECTOR */
 //    .short 0xffff           /* limit 15:00 */
 //    .short 0x0000           /* base 15:00 */
 //    .byte  0x00             /* base 23:16 */
@@ -165,10 +208,9 @@ gdt:
 //    .byte  0x0              /* base 31:24 */
 //
 
-
     /* TSS_SELECTORs */
     .short 0x68              /* limit 15:00 */
-    .short tss                /* base 15:00 */
+    .short 0x0                /* base 15:00 */
     .byte  0                /* base 23:16 */
     .byte  0b10001001       /* P(1) DPL(00) 0 10 B(0) 1 */
     .byte  0b10000000       /* G(1) 0 0 AVL(0) limit 19:16 */
@@ -178,7 +220,7 @@ gdt:
     .int   0x00000000       /* reserved/sbz */
 gdtr:
 	.word	gdtr - gdt - 1
-	.quad	gdt
+	.quad	PHY_ADDR(gdt)
 
 tss:
 	.long	 0x0  // reserved
