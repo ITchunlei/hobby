@@ -20,12 +20,14 @@
 //(6)    这时候处理器自动将EFER.LMA设置，进入长模式
 //(7)    一个跳转
 
+#define K_DATA_SELECTOR 0x10
+
 .text
 .code32
 .global _start
 _start:
-	mov $0x10, %ax
-	mov %ax, %ds
+    mov $K_DATA_SELECTOR, %ax
+    mov %ax, %ds
 	mov %ax, %es
 	mov %ax, %ss
 	mov %ax, %fs
