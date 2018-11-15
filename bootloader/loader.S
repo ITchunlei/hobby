@@ -107,10 +107,44 @@ protect_mode:
 
 	call	main32
 
-	xor %eax, %eax
-	mov $0x1100, %eax
-	jmp *%eax
 
+page_table_init:
+    movl $0x91003, 0x90000
+	
+    movl $0x92003, 0x91000
+
+    movl $0x000083, 0x92000
+    movl $0x200083, 0x92008
+    movl $0x400083, 0x92010
+    movl $0x600083, 0x92018
+    movl $0x800083, 0x92020
+    movl $0xa00083, 0x92028
+
+#	open PAE
+	mov	%cr4,	%eax
+	bts	$5,	%eax
+	mov	%eax,	%cr4
+
+#	load cr3
+	mov	$0x90000,	%eax
+	mov	%eax,	%cr3
+
+#	enable 64bit mode
+	mov	$0x0c0000080, %ecx
+	rdmsr
+	bts	$8, %eax
+	wrmsr
+
+#	open PE and pading(cr0)
+	mov	%cr0, %eax
+	bts	$0, %eax
+	bts	$31, %eax
+	mov %eax, %cr0
+
+#    jump to kernel
+    pushl $0x18
+    pushl $0x1100
+    lretl
 
 	.balign 8
 gdt:
@@ -131,6 +165,9 @@ gdt:
     .byte  0b10010010       /* P(1) DPL(00) S(1) 0 E(0) W(1) A(0) */
     .byte  0b11001111       /* G(1) B(1) 0 0 limit 19:16 */
     .byte  0x0              /* base 31:24 */
+
+    .quad    0x0020980000000000            /*1    KERNEL    Code    64-bit    Segment    08*/
+    .quad    0x0000920000000000            /*2    KERNEL    Data    64-bit    Segment    10*/
 
     /* -- 16 bit real mode CS --
      * base = 0x00000000, limit 0x0FFFF (1 B Granularity), present
