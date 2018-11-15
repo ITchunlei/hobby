@@ -88,8 +88,8 @@ Kernel kernel;
 void kernel_main()
 {
     kprintf("=============kernel_main============\n");
-    kprintf("__code_start: %x\n", __code_start);
-    kprintf("_end: %x\n", _end);
+    kprintf("__code_start: %lx\n", __code_start);
+    kprintf("_end: %lx\n", _end);
     kernel.Start();
     __asm__ __volatile__("int $0x0");
     kernel.Loop();

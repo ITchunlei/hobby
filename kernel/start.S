@@ -31,122 +31,85 @@
 
 #define PHY_ADDR(x) ((x) - KERNEL_BASE + KERNEL_LOADED)
 
+#define KERNEL_OFFSET 0x0
+#define PA(x) ((x) - KERNEL_BASE + KERNEL_OFFSET)
+
+#define LOAD_GDT(l,b)   \
+    
+
 .section .text
-.code32
 .global _start
 _start:
-    // load gdtr
-	lgdt PHY_ADDR(gdtr)
+    movq $PA(stack_top), %rsp
+page_init:
+    #	top-level pde
+    movl $0x61003, 0x60000
+    movl $0x63003, 0x60800
 
-	// set data selector
-    movw $K_DATA32_SELECTOR, %ax
-    movw %ax, %ds
-    movw %ax, %es
-    movw %ax, %ss
-    movw %ax, %fs
-    movw %ax, %gs
+    #two-level pde
+    movl $0x62003, 0x61000
 
-	// use our gdt table
-    pushl $K_CODE32_SELECTOR
-	pushl $PHY_ADDR(.Lstart32)
-	lret
+    #pde
+    movl $(0x000083 + 0x0), 0x62000
+    movl $(0x200083 + 0x0), 0x62008
+    movl $(0x400083 + 0x0), 0x62010
+    movl $(0x600083 + 0x0), 0x62018
+    movl $(0x800083 + 0x0), 0x62020
+    movl $(0xa00083 + 0x0), 0x62028
 
-.Lstart32:
-    mov $PHY_ADDR(stack_top), %esp
+    movl $0x64003, 0x63000
 
-#	top-level pde
-	movl	$0x91003,	0x90000
-    movl    $0x91003,    0x90008
-    movl    $0x91003,    0x90010
-    movl    $0x91003,    0x90018
-    movl    $0x91003,    0x90020
-    movl    $0x91003,    0x90028
-    movl    $0x91003,    0x90030
-    movl    $0x91003,    0x90038
-    movl    $0x91003,    0x90040
-    movl    $0x91003,    0x90048
-    movl    $0x91003,    0x90050
-    movl    $0x91003,    0x90058
-    movl    $0x91003,    0x90060
-    movl    $0x91003,    0x90068
-    movl    $0x91003,    0x90070
-    movl    $0x91003,    0x90078
-    movl    $0x91003,    0x90080
-    movl    $0x91003,    0x90088
-    movl    $0x91003,    0x90090
-    movl    $0x91003,    0x90098
-#	movq	$0x91007,	0x90800
+    movl $(0x000083 + 0x1100), 0x64000
+    movl $(0x200083 + 0x1100), 0x64008
+    movl $(0x400083 + 0x1100), 0x64010
+    movl $(0x600083 + 0x1100), 0x64018
+    movl $(0x800083 + 0x1100), 0x64020
+    movl $(0xa00083 + 0x1100), 0x64028
 
-#	two-level pde
-	movl	$0x92003,	0x91000
+    #open PAE
+    movq %cr4, %rax
+    bts $5, %rax
+    movq %rax, %cr4
 
-#	pde
-	movl	$0x000083,	0x92000
-	movl	$0x200083,	0x92008
-	movl	$0x400083,	0x92010
-	movl	$0x600083,	0x92018
-	movl	$0x800083,	0x92020
-	movl	$0xa00083,	0x92028
+    #load cr3
+    movq $0x60000, %rax
+    movq %rax, %cr3
 
-#	open PAE
-	mov	%cr4,	%eax
-	bts	$5,	%eax
-	mov	%eax,	%cr4
+    movw $(gdt_end - gdt - 1), %ax
+    movw %ax, -6(%rsp)
+    movq $PA(gdt), %rcx
+    movq %rcx, -4(%rsp)
+    
+    lgdt -6(%rsp)
 
-#	load cr3
-	mov	$0x90000,	%eax
-	mov	%eax,	%cr3
+    pushq $K_CODE_SELECTOR
+    leaq .Lstart(%rip), %rax
+    movq $KERNEL_BASE, %rbx
+    addq %rbx, %rax
+    pushq %rax
+    lretq
 
-#	enable 64bit mode
-	mov	$0x0c0000080, %ecx
-	rdmsr
-	bts	$8, %eax
-	wrmsr
-
-#	open PE and pading(cr0)
-	mov	%cr0, %eax
-	bts	$0, %eax
-	bts	$31, %eax
-	mov %eax, %cr0
-
-	pushl	$K_CODE_SELECTOR
-	pushl	$PHY_ADDR(start64)
-	lret
-
-// 64bit start
-.code64
-start64:
-	movq $0xffff8000000011ae, %rax
-	jmp .
-	jmp *%rax
-
-.Lstart64:
-
-	jmp .
-    movq $K_DATA_SELECTOR, %rax
+.Lstart:
+    lgdt gdtr(%rip)
+    xorq %rax, %rax
     movq %rax, %ds
     movq %rax, %es
     movq %rax, %gs
     movq %rax, %ss
-	lea stack_top(%rip), %rsp
+    movq %rax, %fs
 
-	mov	$0x48, %ax
-	ltr	%ax
+    lea stack_top(%rip), %rsp
 
-    movq    go_to_kernel(%rip),    %rax
-#	pushfq
-    pushq    $0x08
-    pushq    %rax
-    lretq
+    mov	$0x48, %ax
+    ltr	%ax
 
-0:
-	hlt
-	jmp    0b
+    call start_kernel
+    
+.Lhalt:
+    hlt
+    jmp .Lhalt
 
-go_to_kernel:
-	.quad start_kernel
-
-.data
+.section .data
 gdt:
     .quad    0x0000000000000000            /*0    NULL descriptor                   00*/
     .quad    0x0020980000000000            /*1    KERNEL    Code    64-bit    Segment    08*/
@@ -154,17 +117,7 @@ gdt:
     .quad    0x0000000000000000            /*3    USER    Code    32-bit    Segment 18*/
     .quad    0x0000000000000000            /*4    USER    Data    32-bit    Segment 20*/
     .quad    0x0020f80000000000            /*5    USER    Code    64-bit    Segment    28*/
-/* USER_CODE_64_SELECTOR */
-//    .short 0xffff           /* limit 15:00 */
-//    .short 0x0000           /* base 15:00 */
-//    .byte  0x00             /* base 23:16 */
-//    .byte  0b11111010       /* P(1) DPL(11) S(1) 1 C(0) R(1) A(0) */
-//    .byte  0b10101111       /* G(1) D(0) L(1) AVL(0) limit 19:16 */
-//    .byte  0x0              /* base 31:24 */
-
-
-
-	.quad    0x0000f20000000000            /*6    USER    Data    64-bit    Segment    30*/
+    .quad    0x0000f20000000000            /*6    USER    Data    64-bit    Segment    30*/
     .quad    0x00cf9a000000ffff            /*7    KERNEL    Code    32-bit    Segment    38*/
     .quad    0x00cf92000000ffff            /*8    KERNEL    Data    32-bit    Segment    40*/
 //    /* null entry */
@@ -218,17 +171,18 @@ gdt:
     /* second half of 64bit desciptor */
     .int   0x00000000       /* base 63:32 */
     .int   0x00000000       /* reserved/sbz */
+gdt_end:
 gdtr:
-	.word	gdtr - gdt - 1
-	.quad	PHY_ADDR(gdt)
+    .word	gdtr - gdt - 1
+    .quad	gdt
 
 tss:
-	.long	 0x0  // reserved
-	.quad	 0x300000  //rsp0
-	.quad	 0x0  //rsp1
-	.quad	 0x0  //rsp2
-	.quad	 0x0  //reserved
-	.quad	 0x7c00  //ist1
+    .long	 0x0  // reserved
+    .quad	 0x300000  //rsp0
+    .quad	 0x0  //rsp1
+    .quad	 0x0  //rsp2
+    .quad	 0x0  //reserved
+    .quad	 0x7c00  //ist1
     .quad    0x7c00  //ist2
     .quad    0x7c00  //ist3
     .quad    0x7c00  //ist4
@@ -236,13 +190,12 @@ tss:
     .quad    0x7c00  //ist6
     .quad    0x7c00  //ist7
     .quad    0x0  //reserved
-	.long	 0x0  // i/o map base address
+    .long	 0x0  // i/o map base address
 
 
 .globl _boot_param
 _boot_param:
-	.quad 0x0
-
+    .quad 0x0
 .bss
-	.space 1024 * 4
+    .space 1024 * 4
 stack_top:
