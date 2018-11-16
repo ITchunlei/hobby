@@ -16,6 +16,8 @@
 #define __EXTERN_C_END
 #endif
 
+
+#define __ALIGNED(x) __attribute__((aligned(x)))
 #define __PACKED __attribute__((packed))
 
 #endif /* __MACROS_H__ */

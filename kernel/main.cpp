@@ -7,11 +7,14 @@
 //
 
 #include "types.h"
+#include "reg.h"
 #include "lib.h"
 #include "main.h"
 
 extern char __code_start[];
 extern char _end[];
+
+extern u64_t boot_alloc_start;
 
 #define IDT_TABLE_VECTOR_SIZE 256
 
@@ -85,13 +88,38 @@ void Kernel::Loop() {
 
 Kernel kernel;
 
+
+void mm_init(void);
+
+
 void kernel_main()
 {
     kprintf("=============kernel_main============\n");
     kprintf("__code_start: %lx\n", __code_start);
     kprintf("_end: %lx\n", _end);
+
+    kprintf("cr0: %lx, cr3:%lx, cr4: %lx\n", get_cr0(), get_cr3(), get_cr4());
+
+    kprintf("boot_alloc_start: %lx\n", boot_alloc_start);
+    
+    kprintf("initialize memery.\n");
+    mm_init();
+    
+
     kernel.Start();
     __asm__ __volatile__("int $0x0");
     kernel.Loop();
+}
+
+
+// memery init
+#define PAGE_SIZE 0x1000
+#define PDT_SIZE 512
+uint64_t pml4e[PDT_SIZE] __ALIGNED(PAGE_SIZE);
+uint64_t pdt[PDT_SIZE] __ALIGNED(PAGE_SIZE);
+uint64_t pte[PDT_SIZE] __ALIGNED(PAGE_SIZE);
+
+void mm_init() {
+
 }
 

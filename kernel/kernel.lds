@@ -5,10 +5,10 @@ SECTIONS {
 . = 0xffff800000000000 + 0x1100;
 PROVIDE_HIDDEN(__code_start = .);
 .text : { *(.text) }
-. = ALIGN(8);
-.data : { *(.data) }
+.data : ALIGN(4096) { *(.data) }
 .rodata : { *(.rodata) }
-.bss : { *(.bss) }
+.bss : ALIGN(4096) { *(.bss) }
+. = ALIGN(4096);
 PROVIDE_HIDDEN(_end = .);
 }
 
