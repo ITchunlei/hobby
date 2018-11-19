@@ -14,17 +14,6 @@
 
 #define IDT_ATTR(P, DPL, TYPE, IST)
 
-extern char _end[];
-
-u64_t boot_alloc_start;
-
-void boot_alloc() {
-    boot_alloc_start = (u64_t)_end;
-__asm__(""
-            : "=g"(boot_alloc_start)
-            : "0"(boot_alloc_start));
-}
-
 void timer_interrupt();
 
 void user_mode();

@@ -12,7 +12,7 @@ LDFLAGS := -b elf64-x86-64 -z muldefs
 
 TARGET = kernel.elf
 
-objs = kernel.elf start.o kmain.o interrupt.o exception.o main.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
+objs = kernel.elf start.o idt.o kmain.o interrupt.o exception.o main.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
 
 .PHONY : everything clean all
 
@@ -56,5 +56,8 @@ thread.o : thread.cpp
 proc.o : proc.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-kernel.elf : start.o kmain.o interrupt.o exception.o main.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
+idt.o : idt.S
+	$(CC) $(CFLAGS) -o $@ $^
+
+kernel.elf : start.o idt.o kmain.o interrupt.o exception.o main.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
 	$(LD) $(LDFLAGS) -o $@ $^ -T kernel.lds

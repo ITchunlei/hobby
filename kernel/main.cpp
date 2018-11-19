@@ -14,8 +14,6 @@
 extern char __code_start[];
 extern char _end[];
 
-extern u64_t boot_alloc_start;
-
 #define IDT_TABLE_VECTOR_SIZE 256
 
 class IDT_Table {
@@ -99,8 +97,6 @@ void kernel_main()
     kprintf("_end: %lx\n", _end);
 
     kprintf("cr0: %lx, cr3:%lx, cr4: %lx\n", get_cr0(), get_cr3(), get_cr4());
-
-    kprintf("boot_alloc_start: %lx\n", boot_alloc_start);
     
     kprintf("initialize memery.\n");
     mm_init();

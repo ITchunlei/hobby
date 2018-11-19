@@ -41,9 +41,7 @@
 .global _start
 _start:
     movq $PA(stack_top), %rsp
-
-    call boot_alloc
-
+    
 page_init:
     #	top-level pde
     movl $0x61003, 0x60000
