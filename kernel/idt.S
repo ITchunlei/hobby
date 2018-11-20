@@ -2,11 +2,19 @@
 
 .macro setup_interrupt
 l_\@:
-.if \@ < 8 || (\@ > 8 && \@ < 10) || (\@ > 14 && \@ < 17) || \@ > 17
-    pushq $0
-.endif
+.if \@ == 8 || (\@ >= 10 && \@ <= 14) || \@ == 17
     pushq $\@
     jmp _interrupt
+.else
+    pushq $0
+    pushq $\@
+    jmp _interrupt
+.endif   
+# .if \@ < 8 || (\@ > 8 && \@ < 10) || (\@ > 14 && \@ < 17) || \@ > 17
+#     pushq $0
+# .endif
+#     pushq $\@
+#     jmp _interrupt
 .pushsection .rodata.interrupt
 .quad l_\@
 .popsection
@@ -51,7 +59,11 @@ _interrupt:
 
     movq %rsp, %rdi
 
+    #lea stack_top(%rip), %rsp
+
     call do_interrupt
+
+
 
 .Lrestore_context:
     # restore context
@@ -89,4 +101,8 @@ _interrupt:
  restore_context:
     movq %rdi, %rsp
     jmp .Lrestore_context
+
+ .global context_stack
+context_stack:
+    .quad 0x0   
 

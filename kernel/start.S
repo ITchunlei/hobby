@@ -92,8 +92,8 @@ page_init:
 
     lea stack_top(%rip), %rsp
 
-    mov	$0x48, %ax
-    ltr	%ax
+    # mov	$0x48, %ax
+    # ltr	%ax
 
     call start_kernel
     
@@ -115,7 +115,7 @@ gdt:
 .global tss_desc_table
 tss_desc_table:
     /* TSS_SELECTORs */
-    .short 0x68              /* limit 15:00 */
+    .short 0x0              /* limit 15:00 */
     .short 0x0                /* base 15:00 */
     .byte  0                /* base 23:16 */
     .byte  0b10001001       /* P(1) DPL(00) 0 10 B(0) 1 */
@@ -151,4 +151,5 @@ _boot_param:
     .quad 0x0
 .bss
     .space 1024 * 4
+.global stack_top
 stack_top:

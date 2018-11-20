@@ -33,6 +33,8 @@ void start_kernel()
     
     kprintf("start_kernel\n");
 
+    init_i8259a();
+
     kernel_main();
     
 /*
@@ -62,7 +64,7 @@ void start_kernel()
     load_idt(idt_ptr);
     */
     //kprintf("init i8259a\n");
-    //init_i8259a();
+
     //open_irq();
     
     //__asm__ __volatile__("int $0");
