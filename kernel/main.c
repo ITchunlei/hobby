@@ -63,7 +63,6 @@ void start_kernel()
     */
     //kprintf("init i8259a\n");
     //init_i8259a();
-    
     //open_irq();
     
     //__asm__ __volatile__("int $0");

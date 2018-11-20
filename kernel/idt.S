@@ -25,13 +25,68 @@ setup_interrupt
 
 .global _interrupt
 _interrupt:
-    movq 0(%rsp), %rdi
-    movq 8(%rsp), %rsi
-    movq 16(%rsp), %rdx
-    movq 24(%rsp), %rcx
-    movq 32(%rsp), %r8
-    movq 40(%rsp), %r9
+    cld
+
+    # save context
+    pushq   %rax
+    pushq   %rcx
+    pushq   %rdx
+    pushq   %rbx
+    pushq   %rsi
+    pushq   %rdi
+    pushq   %r8
+    pushq   %r9
+    pushq   %r10
+    pushq   %r11
+    pushq   %r12
+    pushq   %r13
+    pushq   %r14
+    pushq   %r15
+    movq    %ds, %rax
+    pushq   %rax
+    movq    %es, %rax
+    pushq   %rax
+    pushq   %fs
+    pushq   %gs
+
+    movq %rsp, %rdi
+
     call do_interrupt
-    addq $0x10,	%rsp
+
+.Lrestore_context:
+    # restore context
+    popq    %gs
+    popq    %fs
+    popq    %rax
+    movq    %rax, %es
+    popq    %rax
+    movq    %rax, %ds
+    popq    %r15
+    popq    %r14
+    popq    %r13
+    popq    %r12
+    popq    %r11
+    popq    %r10
+    popq    %r9
+    popq    %r8
+    popq    %rdi
+    popq    %rsi
+    popq    %rbx
+    popq    %rdx
+    popq    %rcx
+    popq    %rax
+
+#   popq    %cs
+#   popq    %rip
+#   popq    %rsp
+#   popq    %ss
+
+    addq $0x10, %rsp
+    #hlt
     iretq
+
+ .global restore_context
+ restore_context:
+    movq %rdi, %rsp
+    jmp .Lrestore_context
 

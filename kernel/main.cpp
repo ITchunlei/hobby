@@ -19,6 +19,9 @@ typedef uint64_t uintptr_t;
 // ======================= idt ====================
 #define IDT_TABLE_VECTOR_SIZE 256
 
+#define UC_SEL 0x28 + 0x3
+#define UD_SEL 0x30 + 0x3
+
 struct TSS {
     u32_t reserved0;
     u64_t rsp[3]; 
@@ -79,8 +82,51 @@ void tss_init(tss_t* tss) {
 
 tss_t tss_table[1];
 
+
+struct Context {
+    uint64_t gs, fs, es, ds;
+    uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
+    uint64_t rdi, rsi, rbx, rdx, rcx, rax;
+    uint64_t vec_no, error_code;
+    uint64_t rip, cs, rflags;
+    uint64_t rsp, ss;
+};
+
+typedef Context context_t;
+
+struct Thread {
+    context_t context;
+    uintptr_t entry;
+    char ustack[1024];
+};
+
+typedef Thread thread_t;
+
+void thread_create(thread_t* thread, uintptr_t entry) {
+    thread->entry = entry;
+
+    context_t* ctx = &thread->context;
+
+    ctx->gs = UD_SEL;
+    ctx->fs = UD_SEL;
+    ctx->es = 0;
+    ctx->ds = 0;
+    ctx->vec_no = 0x20;
+    ctx->error_code = 0;
+    ctx->rip = thread->entry;
+    ctx->cs = UC_SEL;
+    ctx->rflags = 0x1202;
+    ctx->rsp = (uintptr_t)thread->ustack;
+    ctx->ss = UD_SEL;
+}
+
+#define NR_THREAD 10
+
+thread_t thread_table[NR_THREAD];
+
 extern "C" {
-    void do_interrupt(int vec_no);
+    void do_interrupt(context_t* ctx);
+    void restore_context(context_t *context);
 }
 
 class IDT_Table {
@@ -136,16 +182,36 @@ void IDT_Table::DefaultHandler() {
 }
 
 
-void do_interrupt(int vec_no) {
-    kprintf("do_interrupt:%lx\n", vec_no);
-    if (vec_no == 30) {
-        kprintf("timer interrupt~");
+void do_interrupt(context_t* ctx) {
+    kprintf("do_interrupt vec_no:%lx\n", ctx->vec_no);
+    kprintf("do_interrupt error_code:%lx\n", ctx->error_code);
+    kprintf("do_interrupt rip:%lx\n", ctx->rip);
+
+    if (ctx->vec_no < 0x20) {
+        __asm__ __volatile__("hlt\n\t");
+    }
+
+    if (ctx->vec_no == 0x20) {
+
+
+        // thread_t *current = &thread_table[0];
+
+        // kprintf("timer interrupt~");
+        // __asm__ __volatile__("mov $0x20, %al");
+        // __asm__ __volatile__("out %al, $0x20\n\t");
     }
 }
 
 IDT_Table idt_table;
 
 // ========================= idt end ==========================
+
+
+
+void init() {
+    kprintf("user init~\n");
+    for(;;);
+}
 
 class Kernel {
 public:
@@ -164,7 +230,14 @@ void Kernel::Start() {
     idt_table.Init();
     idt_table.Load();
 
+    thread_t *thread = &thread_table[0];
 
+    thread_create(thread, (uintptr_t)&init);
+
+    kprintf("init rip: %lx\n", (uintptr_t)&init);
+    kprintf("thread->context: %lx\n", &thread->context);
+
+    restore_context(&thread->context);
 
 }
 
@@ -191,7 +264,7 @@ void kernel_main()
     
 
     kernel.Start();
-    kernel.Loop();
+    //kernel.Loop();
 }
 
 
@@ -205,4 +278,3 @@ uint64_t pte[PDT_SIZE] __ALIGNED(PAGE_SIZE);
 void mm_init() {
 
 }
-
