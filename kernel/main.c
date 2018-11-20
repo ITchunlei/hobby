@@ -32,6 +32,10 @@ void start_kernel()
     close_irq();
     
     kprintf("start_kernel\n");
+
+    kernel_main();
+    
+/*
     gate_t* idt = (gate_t*)0x100000;
     
     
@@ -56,7 +60,7 @@ void start_kernel()
     idt_ptr.base = (u64_t)idt;
     
     load_idt(idt_ptr);
-    
+    */
     //kprintf("init i8259a\n");
     //init_i8259a();
     
@@ -66,8 +70,6 @@ void start_kernel()
     
     
     //user_mode();
-    
-    kernel_main();
-    
+        
     for(;;);
 }

@@ -49,7 +49,7 @@ install-loader :
 	dd if=loader.bin of=debug/a.img bs=512 seek=1 count=2
 
 install-kernel : 
-	dd if=kernel.bin of=debug/a.img bs=512 seek=3 count=20
+	dd if=kernel.bin of=debug/a.img bs=512 seek=3 count=40
 
 debug : 
 	(cd debug; bochs -f bochsrc)

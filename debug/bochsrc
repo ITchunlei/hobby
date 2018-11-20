@@ -15,4 +15,4 @@ mouse: enabled=0
 
 keyboard: keymap=#$BXSHARE/keymaps/x11-pc-us.map
 
-megs: 128
+megs: 512

@@ -6,7 +6,7 @@ SECTIONS {
 PROVIDE_HIDDEN(__code_start = .);
 .text : { *(.text) }
 .data : ALIGN(4096) { *(.data) }
-.rodata : { *(.rodata) }
+.rodata : { *(.rodata*) }
 .bss : ALIGN(4096) { *(.bss) }
 . = ALIGN(4096);
 PROVIDE_HIDDEN(_end = .);

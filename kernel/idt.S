@@ -1,37 +1,37 @@
-#define IDT_SIZE 256
+#define SIZE 256
 
-#include "asm.h"
-
-.macro di idx, error_code=0
-.global _int\idx
-._int\idx:
-.if \error_code == 0
-    push $\error_code
+.macro setup_interrupt
+l_\@:
+.if \@ < 8 || (\@ > 8 && \@ < 10) || (\@ > 14 && \@ < 17) || \@ > 17
+    pushq $0
 .endif
-    push $1
+    pushq $\@
+    jmp _interrupt
+.pushsection .rodata.interrupt
+.quad l_\@
+.popsection
 .endm
 
-
-.macro sum i=0, size=8
-.global label_\i
-label_\i:
-.if \i == 8 || (\i >= 10 && \i <= 14) || \i == 17
-.else    
-.endif
-.if \size-\i
-//sum "(\i+1)", \size
-.endif
-    jmp do_interrupt
-.endm
 
 .text
-.global _int_table
-_int_table:
-.rept 5
-di 0
+.global _interrupt_table
+.balign 8
+.pushsection .rodata.interrupt
+_interrupt_table:
+.popsection
+.rept SIZE
+setup_interrupt
 .endr
 
-.global do_interrupt
-do_interrupt:
+.global _interrupt
+_interrupt:
+    movq 0(%rsp), %rdi
+    movq 8(%rsp), %rsi
+    movq 16(%rsp), %rdx
+    movq 24(%rsp), %rcx
+    movq 32(%rsp), %r8
+    movq 40(%rsp), %r9
+    call do_interrupt
+    addq $0x10,	%rsp
     iretq
 

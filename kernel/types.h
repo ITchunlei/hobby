@@ -13,31 +13,7 @@ inline void set_desc()
     
 }
 
-typedef struct {
-    u32_t	reserved0;
-//    u64_t    rsp0;
-//    u64_t     rsp1;
-//    u64_t    rsp2;
-   
-    u64_t	rsp[3];
-    
-    u32_t	reserved1;
-    u32_t	reserved2;
-//    u64_t    ist1;
-//    u64_t    ist2;
-//    u64_t    ist3;
-//    u64_t    ist4;
-//    u64_t    ist5;
-//    u64_t    ist6;
-//    u64_t    ist7;
-    
-    u64_t	ist[7];
-    
-    u32_t	reserved3;
-    u32_t	reserved4;
-    u16_t	reserved5;
-    u16_t	io_map;
-}__attribute__((packed)) tss_t;
+
 
 typedef struct {
     u16_t offset_1;

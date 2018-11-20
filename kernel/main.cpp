@@ -14,7 +14,74 @@
 extern char __code_start[];
 extern char _end[];
 
+typedef uint64_t uintptr_t;
+
+// ======================= idt ====================
 #define IDT_TABLE_VECTOR_SIZE 256
+
+struct TSS {
+    u32_t reserved0;
+    u64_t rsp[3]; 
+    u32_t reserved1;
+    u32_t reserved2;
+    u64_t ist[7];
+    u32_t reserved3;
+    u32_t reserved4;
+    u16_t reserved5;
+    uint32_t io_map;
+} __PACKED;
+
+typedef TSS tss_t;
+
+struct TSS_Desc {
+    uint16_t limit;
+    uint16_t base1;
+    uint8_t base2;
+    uint16_t attr;
+    uint8_t base3;
+    uint32_t base4;
+    uint32_t reserved;
+} __PACKED;
+
+typedef TSS_Desc tss_desc_t;
+
+static void ltr(uint16_t sel) {
+    __asm__ __volatile__("ltr %%ax"::"a"(sel));
+}
+
+
+void setup_tss_desc(tss_t* tss, uint16_t size) {
+    extern tss_desc_t tss_desc_table[];
+    for (int i = 0;i < size; ++i) {
+        tss_desc_t *t = &(tss_desc_table[i]);
+        uint64_t base = (uint64_t)tss;
+        t->base1 = base & 0x68;
+        t->base2 = base & 0xffff;
+        t->base2 = base >> 16 & 0xff0000;
+        t->attr = 0x8089;
+        t->base3 = base >> 24 & 0xff000000;
+        t->base4 = base >> 32 & 0xffffffff00000000;
+        t->reserved = 0x0;
+    }
+}
+
+void tss_init(tss_t* tss) {
+    tss->rsp[0] = 0x300000;
+    tss->ist[0] = 0x7c00;
+    tss->ist[1] = 0x7c00;
+    tss->ist[2] = 0x7c00;
+    tss->ist[3] = 0x7c00;
+    tss->ist[4] = 0x7c00;
+    tss->ist[5] = 0x7c00;
+    tss->ist[6] = 0x7c00;
+    tss->io_map = 0x0;
+}
+
+tss_t tss_table[1];
+
+extern "C" {
+    void do_interrupt(int vec_no);
+}
 
 class IDT_Table {
 public:
@@ -40,8 +107,10 @@ private:
 };
 
 void IDT_Table::Init() {
+    extern uintptr_t _interrupt_table[];
     for (auto i = 0;i < IDT_TABLE_VECTOR_SIZE; ++i) {
-        this->Setup(i, 0x8, 0x8E00, (u64_t)&IDT_Table::DefaultHandler);
+        //this->Setup(i, 0x8, 0x8E00, (u64_t)&IDT_Table::DefaultHandler);
+        this->Setup(i, 0x8, 0x8E00, _interrupt_table[i]);
     }
 }
 
@@ -66,8 +135,17 @@ void IDT_Table::DefaultHandler() {
     kprintf("DefaultHandler\n");
 }
 
+
+void do_interrupt(int vec_no) {
+    kprintf("do_interrupt:%lx\n", vec_no);
+    if (vec_no == 30) {
+        kprintf("timer interrupt~");
+    }
+}
+
 IDT_Table idt_table;
 
+// ========================= idt end ==========================
 
 class Kernel {
 public:
@@ -76,8 +154,18 @@ public:
 };
 
 void Kernel::Start() {
+
+    setup_tss_desc(tss_table, 1);
+
+    tss_init(tss_table);
+
+    ltr(0x48);
+
     idt_table.Init();
     idt_table.Load();
+
+
+
 }
 
 void Kernel::Loop() {
@@ -103,7 +191,6 @@ void kernel_main()
     
 
     kernel.Start();
-    __asm__ __volatile__("int $0x0");
     kernel.Loop();
 }
 
