@@ -2,8 +2,8 @@
 #AS = as
 #LD = ld
 
-#CC = x86_64-linux-gnu-gcc
-#C++ = x86_64-linux-gnu-g++
+#CC = x86_64-linux-gnu-g++
+#CXX = x86_64-linux-gnu-g++
 #LD = x86_64-linux-gnu-ld
 
 CFLAGS := -mcmodel=large -fno-stack-protector -fno-builtin -m64 -c
