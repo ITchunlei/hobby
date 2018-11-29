@@ -209,6 +209,8 @@ IDT_Table idt_table;
 
 extern "C" {
 
+void apic_test();
+
 void test() {
     for (int i = 0;i < 10000;i ++) {
         for (int j = 0;j < 100000;j ++) {}
@@ -272,6 +274,10 @@ void kernel_main()
     
 
     kernel.Start();
+
+
+apic_test();
+
     //kernel.Loop();
 }
 

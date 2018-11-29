@@ -33,7 +33,7 @@ void start_kernel()
     
     kprintf("start_kernel\n");
 
-    init_i8259a();
+   // init_i8259a();
 
     kernel_main();
     
