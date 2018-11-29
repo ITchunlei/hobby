@@ -247,7 +247,7 @@ void Kernel::Start() {
     tss_t* tss = &(tss_table[0]);
     tss->rsp0 = (uintptr_t)(&thread->context) - sizeof(context_t);
 
-    restore_context(&thread->context);
+    //restore_context(&thread->context);
 
 }
 

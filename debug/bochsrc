@@ -1,10 +1,10 @@
-
 cpu: model=core2_penryn_t9600, count=2, ips=50000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
 #cpu: cpuid_limit_winnt=0
 
 cpuid: x86_64=1, mmx=1, sep=1, simd=sse4_2, apic=xapic, aes=1, movbe=1, xsave=1
 #cpuid: family=6, model=0x1a, stepping=5
 
+#display_library: sdl2, options="fullscreen" # startup in fullscreen mode
 
 romimage: file=$BXSHARE/BIOS-bochs-latest 
 
