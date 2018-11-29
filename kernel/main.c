@@ -11,6 +11,8 @@
 #include "i8259a.h"
 #include "exception.h"
 #include "types.h"
+#include "reg.h"
+#include "mem.h"
 
 #define IDT_ATTR(P, DPL, TYPE, IST)
 
@@ -30,12 +32,17 @@ void l3_mode() {
 void start_kernel()
 {
     close_irq();
-    
+    int i = 0;
+    for (;i < 17;i ++) {
+        kprintf("\n");
+    }
     kprintf("start_kernel\n");
+
+    mem_init();
 
    // init_i8259a();
 
-    kernel_main();
+   // kernel_main();
     
 /*
     gate_t* idt = (gate_t*)0x100000;

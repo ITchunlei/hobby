@@ -219,7 +219,7 @@ void test() {
 
 class Kernel {
 public:
-    virtual void Start();
+    void Start();
     void Loop();
 };
 
