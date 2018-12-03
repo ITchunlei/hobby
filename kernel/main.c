@@ -11,6 +11,32 @@
 #include "i8259a.h"
 #include "exception.h"
 #include "types.h"
+#include "reg.h"
+
+
+// memery init
+
+#define PML4E_SHIFT 39
+#define PDE_SHIFT 30
+#define PTE_SHIFT 21
+#define PAGE_SHIFT 12
+
+#define PAGE_SIZE (1UL << PAGE_SHIFT)
+
+typedef uint64_t pml4e_t;
+typedef uint64_t pde_t;
+typedef uint64_t pte_t;
+
+pml4e_t pml4e[512] __ALIGNED(PAGE_SIZE);
+pde_t pde[512] __ALIGNED(PAGE_SIZE);
+pte_t pte[512] __ALIGNED(PAGE_SIZE);
+
+void mm_init() {
+
+}
+
+
+
 
 #define IDT_ATTR(P, DPL, TYPE, IST)
 

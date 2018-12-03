@@ -44,19 +44,23 @@ _start:
     
 page_init:
     #	top-level pde
-    movl $0x61007, 0x60000
-    movl $0x61007, 0x60800
+    movq $PA(pml4e), %rbx
+
+    movq $(PA(pde) + 0x7), (%rbx)
+    movq $(PA(pde) + 0x7), 0x800(%rbx)
 
     #two-level pde
-    movl $0x62007, 0x61000
+    movl $(PA(pte) + 0x7), PA(pde)
 
     #pde
-    movl $0x000087, 0x62000
-    movl $0x200087, 0x62008
-    movl $0x400087, 0x62010
-    movl $0x600087, 0x62018
-    movl $0x800087, 0x62020
-    movl $0xa00087, 0x62028
+    movq $PA(pte), %rax
+
+    movl $0x000087, (%rax)
+    movl $0x200087, 0x8(%rax)
+    movl $0x400087, 0x10(%rax)
+    movl $0x600087, 0x18(%rax)
+    movl $0x800087, 0x20(%rax)
+    movl $0xa00087, 0x28(%rax)
 
     #open PAE
     movq %cr4, %rax
@@ -64,8 +68,8 @@ page_init:
     movq %rax, %cr4
 
     #load cr3
-    movq $0x60000, %rax
-    movq %rax, %cr3
+    #movq $0x60000, %rax
+    movq %rbx, %cr3
 
     movw $(gdt_end - gdt - 1), %ax
     movw %ax, -6(%rsp)

@@ -258,9 +258,6 @@ void Kernel::Loop() {
 Kernel kernel;
 
 
-void mm_init(void);
-
-
 void kernel_main()
 {
     kprintf("=============kernel_main============\n");
@@ -269,10 +266,6 @@ void kernel_main()
 
     kprintf("cr0: %lx, cr3:%lx, cr4: %lx\n", get_cr0(), get_cr3(), get_cr4());
     
-    kprintf("initialize memery.\n");
-    mm_init();
-    
-
     kernel.Start();
 
 
