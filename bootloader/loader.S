@@ -83,6 +83,14 @@ read_sector:
 	pop		%bp
 	ret
 
+
+e820_entry:
+	mov $0x0000e820, %eax
+	mov $0x534d4150, %edx
+	mov $0x0, %ebx
+	mov $20, %ecx
+	
+
 	.code32
 tmp_protect_mode:
     mov    $0x10, %ax
