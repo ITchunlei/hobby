@@ -27,13 +27,13 @@ kernel : kernel.bin  install-kernel
 	rm -rf kernel.bin
 
 boot.bin : bootloader/boot.o
-	$(LD) -melf_i386 --oformat binary -e _start -o $@ $^ -Ttext 0x7c00
+	$(LD) --oformat binary -e _start -o $@ $^ -Ttext 0x7c00
 
 bootloader/boot.o :
 	(cd bootloader; make boot)
 
 loader.bin : bootloader/loader.o
-	$(LD) -melf_i386 --oformat binary -e start -o $@ $^ -Ttext 0x9100
+	$(LD) --oformat binary -e _start -o $@ $^ -Ttext 0x9100
 
 bootloader/loader.o :
 	(cd bootloader; make loader)
