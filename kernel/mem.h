@@ -2,17 +2,20 @@
 #define __MEM_H__
 
 #include "reg.h"
+#include "types.h"
 
 typedef uint64_t paddr_t;
 
 
-inline paddr_t vir2phy(paddr_t vir) {
-	return 0;
+static inline paddr_t virt2phy(void* virt) {
+	return ((uint64_t)virt - 0xffff800000000000);
 }
 
-inline paddr_t phy2vir(paddr_t phy) {
-	return 0;
+static inline void* phy2virt(paddr_t addr) {
+	return (void*)(addr + 0xffff800000000000);
 }
+
+void* mem_boot_alloc(size_t len);
 
 void mem_init();
 

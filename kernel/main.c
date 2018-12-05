@@ -12,8 +12,6 @@
 #include "exception.h"
 #include "types.h"
 #include "reg.h"
-<<<<<<< HEAD
-
 
 // memery init
 
@@ -32,15 +30,10 @@ pml4e_t pml4e[512] __ALIGNED(PAGE_SIZE);
 pde_t pde[512] __ALIGNED(PAGE_SIZE);
 pte_t pte[512] __ALIGNED(PAGE_SIZE);
 
-void mm_init() {
-
-}
 
 
 
-=======
 #include "mem.h"
->>>>>>> d02b0d46525d43aec900df17a7f78845380148e7
 
 #define IDT_ATTR(P, DPL, TYPE, IST)
 
@@ -57,20 +50,19 @@ void l3_mode() {
 }
 
 
-void start_kernel()
+/* irq & trap */
+
+
+
+void kmain()
 {
     close_irq();
-    int i = 0;
-    for (;i < 17;i ++) {
-        kprintf("\n");
-    }
-    kprintf("start_kernel\n");
-
     mem_init();
+    kprintf("---------------------------");
 
    // init_i8259a();
 
-   // kernel_main();
+
     
 /*
     gate_t* idt = (gate_t*)0x100000;

@@ -12,7 +12,7 @@ LDFLAGS := -b elf64-x86-64 -z muldefs
 
 TARGET = kernel.elf
 
-objs = kernel.elf start.o idt.o kmain.o main.o mem.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
+objs = kernel.elf start.o idt.o main.o mem.o lib.o vsprintf.o i8259a.o thread.o
 
 .PHONY : everything clean all
 
@@ -26,8 +26,8 @@ clean :
 start.o : start.S
 	$(CC) $(CFLAGS) -o $@ $^
 
-kmain.o : main.cpp
-	$(CXX) $(CFLAGS) -o $@ $^
+# kmain.o : main.cpp
+# 	$(CXX) $(CFLAGS) -o $@ $^
 
 #interrupt.o : interrupt.S
 #	$(CC) $(CFLAGS) -o $@ $^
@@ -41,8 +41,8 @@ main.o : main.c
 mem.o : mem.c
 	$(CC) $(CFLAGS) -o $@ $^
 
-klib.o : lib.S
-	$(CC) $(CFLAGS) -o $@ $^
+# klib.o : lib.S
+# 	$(CC) $(CFLAGS) -o $@ $^
 
 lib.o : lib.c
 	$(CC) $(CFLAGS) -o $@ $^
@@ -56,11 +56,11 @@ i8259a.o : i8259a.c
 thread.o : thread.cpp
 	$(CXX) $(CFLAGS) -o $@ $^
 
-proc.o : proc.c
-	$(CC) $(CFLAGS) -o $@ $^
+# proc.o : proc.c
+# 	$(CC) $(CFLAGS) -o $@ $^
 
 idt.o : idt.S
 	$(CC) $(CFLAGS) -o $@ $^
 
-kernel.elf : start.o idt.o kmain.o main.o mem.o klib.o lib.o vsprintf.o i8259a.o thread.o proc.o
+kernel.elf : start.o idt.o main.o mem.o lib.o vsprintf.o i8259a.o thread.o
 	$(LD) $(LDFLAGS) -o $@ $^ -T kernel.lds

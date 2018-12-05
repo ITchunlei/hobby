@@ -14,8 +14,6 @@
 extern char __code_start[];
 extern char _end[];
 
-typedef uint64_t uintptr_t;
-
 // ======================= idt ====================
 #define IDT_TABLE_VECTOR_SIZE 256
 
@@ -185,9 +183,9 @@ void IDT_Table::DefaultHandler() {
 
 
 void do_interrupt(context_t* ctx) {
-    // kprintf("do_interrupt vec_no:%lx\n", ctx->vec_no);
-    // kprintf("do_interrupt error_code:%lx\n", ctx->error_code);
-    // kprintf("do_interrupt rip:%lx\n", ctx->rip);
+    kprintf("do_interrupt vec_no:%lx\n", ctx->vec_no);
+    kprintf("do_interrupt error_code:%lx\n", ctx->error_code);
+    kprintf("do_interrupt rip:%lx\n", ctx->rip);
 
     if (ctx->vec_no < 0x20) {
         __asm__ __volatile__("hlt\n\t");
@@ -269,19 +267,9 @@ void kernel_main()
     kernel.Start();
 
 
-apic_test();
+//apic_test();
 
     //kernel.Loop();
 }
 
 
-// memery init
-#define PAGE_SIZE 0x1000
-#define PDT_SIZE 512
-uint64_t pml4e[PDT_SIZE] __ALIGNED(PAGE_SIZE);
-uint64_t pdt[PDT_SIZE] __ALIGNED(PAGE_SIZE);
-uint64_t pte[PDT_SIZE] __ALIGNED(PAGE_SIZE);
-
-void mm_init() {
-
-}

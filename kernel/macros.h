@@ -20,4 +20,6 @@
 #define __ALIGNED(x) __attribute__((aligned(x)))
 #define __PACKED __attribute__((packed))
 
+#define ALIGN(x, y)  (((x) + ((y) - 1)) & ~((y) - 1))
+
 #endif /* __MACROS_H__ */

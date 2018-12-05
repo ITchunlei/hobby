@@ -61,7 +61,7 @@ _interrupt:
 
     #lea stack_top(%rip), %rsp
 
-    call do_interrupt
+    //call do_interrupt
 
 
 

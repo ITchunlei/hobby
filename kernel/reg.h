@@ -9,11 +9,7 @@
 #ifndef __REG_H__
 #define __REG_H__
 #include "macros.h"
-
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+#include "types.h"
 
 
 static inline uint64_t get_cr0() {

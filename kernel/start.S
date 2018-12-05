@@ -99,7 +99,7 @@ page_init:
     # mov	$0x48, %ax
     # ltr	%ax
 
-    call start_kernel
+    call kmain
     
 .Lhalt:
     hlt

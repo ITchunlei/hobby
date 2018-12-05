@@ -43,7 +43,7 @@ char* itoa(char* str, int num)
 
 void kputc(char c)
 {
-    char *pvideo = (char*)0xB8000;
+    char *pvideo = (char*)(0xffff800000000000 + 0xB8000);
     pvideo = pvideo + 2 * position;
     if (c == '\n') {
         int m = 80 - position % 80;
