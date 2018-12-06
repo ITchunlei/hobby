@@ -61,7 +61,7 @@ _interrupt:
 
     #lea stack_top(%rip), %rsp
 
-    //call do_interrupt
+    call do_interrupt
 
 
 
@@ -105,10 +105,3 @@ _interrupt:
  .global context_stack
 context_stack:
     .quad 0x0
-
-
-.global apic_test
-apic_test:
-    movq $0x1, %rax
-    cpuid
-    jmp .    

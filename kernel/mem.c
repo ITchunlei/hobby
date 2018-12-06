@@ -50,7 +50,7 @@ void mem_init() {
 
 	unsigned long i;
 
-	for (i = 0; i < total_page; i++) {
+	for (i = 0; i < 200000; i++) {
 
 		uintptr_t vaddr = i * 4 * 1024 + KERNEL_OFFSET;
 
@@ -63,6 +63,8 @@ void mem_init() {
 
 		if (!(pml4[pdp_idx] & PG_P)) {
 			pdp = mem_boot_alloc(sizeof(uintptr_t) * 512);
+
+			kprintf("%lx\n", virt2phy(pdp));
 			pml4[pdp_idx] = virt2phy(pdp) | PG_P | PG_RW;
 		} else {
 			pdp = (paddr_t*)phy2virt(pml4[pdp_idx] & ~0xfff);
@@ -86,7 +88,7 @@ void mem_init() {
 		pte[page_idx] = (i << 12) | PG_P | PG_RW;
 	}
 
-	set_cr3(virt2phy(pml4));
+	//set_cr3(virt2phy(pml4));
 	//__flush_tlb();
 }
 
