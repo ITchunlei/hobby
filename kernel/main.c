@@ -12,6 +12,7 @@
 #include "exception.h"
 #include "types.h"
 #include "reg.h"
+#include "mem.h"
 
 // memery init
 
@@ -33,21 +34,6 @@ pte_t pte[512] __ALIGNED(PAGE_SIZE);
 
 
 
-#include "mem.h"
-
-#define IDT_ATTR(P, DPL, TYPE, IST)
-
-void timer_interrupt();
-
-void user_mode();
-
-void l3_mode() {
-    for(;;) {
-    	kprintf(".um");
-        int i;
-        for(i = 0;i < 1000000; ++i);
-    }
-}
 
 
 /* irq & trap */
